@@ -1,0 +1,9 @@
+﻿[build]
+builder = "dockerfile"
+doskerfile = "./QR_API/Dockerfile"
+
+
+[deploy]
+startCommand = "./QR_API"
+restartPolicyType = "always"
+healthcheckPath = "/health"

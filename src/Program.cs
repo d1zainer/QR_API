@@ -12,6 +12,9 @@ namespace QR_API
         {
             
             var builder = WebApplication.CreateBuilder(args);
+            var port = Environment.GetEnvironmentVariable(("PORT")) ?? "8080";
+            builder.WebHost.UseUrls($"http://*:{port}");
+            builder.Services.AddHealthChecks();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.EnableAnnotations();
@@ -52,8 +55,8 @@ namespace QR_API
             });
             // Настраиваем маршруты для контроллеров
             app.MapControllers();
-             
 
+            app.UseHealthChecks("/health");
 
             // Запускаем приложение
             app.Run();
