@@ -1,21 +1,26 @@
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
+#For more information, please see https://aka.ms/containercompat
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/QR_API.csproj", "src/"]
 RUN dotnet restore "./src/QR_API.csproj"
 COPY . .
 WORKDIR "/src/src"
-RUN dotnet build "./QR_API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./QR_API.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./QR_API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./QR_API.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
 
-
-
-FROM mcr.microsoft.com/dotnet/runtime-deps:8.0 AS final
+FROM base AS final
 WORKDIR /app
-EXPOSE 8080
 COPY --from=publish /app/publish .
-ENTRYPOINT ["./QR_API"]
+ENTRYPOINT ["dotnet", "QR_API.dll"]
