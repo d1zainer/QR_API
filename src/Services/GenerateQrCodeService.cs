@@ -1,10 +1,7 @@
 ﻿using MessagingToolkit.QRCode.Codec;
-using MessagingToolkit.QRCode.Codec.Data;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Text;
 using QR_API.Models;
-using System.Text.RegularExpressions;
+using IronSoftware.Drawing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QR_API.Services
@@ -20,15 +17,15 @@ namespace QR_API.Services
         public static ActionResult<QrCodeResponse> GetQrByName(QrCodeRequest request)
         {
             QRCodeEncoder encoder = new QRCodeEncoder();
-            encoder.QRCodeBackgroundColor = ColorTranslator.FromHtml(request.BgColor);
-            encoder.QRCodeForegroundColor = ColorTranslator.FromHtml(request.FgColor);
+            encoder.QRCodeBackgroundColor = FromHexToColor(request.BgColor);
+            encoder.QRCodeForegroundColor = FromHexToColor(request.FgColor);
             try
             {
-                Bitmap qrcode = encoder.Encode(request.InputData, Encoding.UTF8);
+                IronSoftware.Drawing.AnyBitmap qrcode = encoder.Encode(request.InputData, Encoding.UTF8);
                 QrCodeResponse response = new QrCodeResponse
                 {
-                    OutputData = Convert.ToBase64String(GetArray(qrcode)), // Конвертируем в Base64
-                    Format = ImageFormat.Png.ToString() // Устанавливаем формат
+                    OutputData = Convert.ToBase64String(qrcode.GetBytes()), // Конвертируем в Base64
+                    Format = AnyBitmap.ImageFormat.Png.ToString() // Устанавливаем формат
                 };
 
                 return new OkObjectResult(response);
@@ -41,18 +38,23 @@ namespace QR_API.Services
                 });
             }
         }
-        /// Создает массив байтов из битмапа
+        /// <summary>
+        /// Преобразует HEX-цвет в System.Drawing.Color
         /// </summary>
-        /// <param name="qrcode"></param>
-        /// <returns></returns>
-        private static byte[] GetArray(Bitmap qrcode)
+        /// <param name="hexColor">Цвет в HEX-формате</param>
+        /// <returns>Объект System.Drawing.Color</returns>
+        private static IronSoftware.Drawing.Color FromHexToColor(string hexColor)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                qrcode.Save(stream, ImageFormat.Png);
-                return stream.ToArray();
-            }
+            // Убираем символ "#" если он есть
+            hexColor = hexColor.Replace("#", string.Empty);
+
+            // Преобразуем HEX в RGB
+            byte r = Convert.ToByte(hexColor.Substring(0, 2), 16);
+            byte g = Convert.ToByte(hexColor.Substring(2, 2), 16);
+            byte b = Convert.ToByte(hexColor.Substring(4, 2), 16);
+
+            return System.Drawing.Color.FromArgb(r, g, b);
         }
-       
+
     }
 }
