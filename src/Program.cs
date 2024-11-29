@@ -10,10 +10,7 @@ namespace QR_API
     {
         public static void Main(string[] args)
         {
-            
             var builder = WebApplication.CreateBuilder(args);
-            var port = Environment.GetEnvironmentVariable(("PORT")) ?? "8080";
-            builder.WebHost.UseUrls($"http://*:{port}");
             builder.Services.AddHealthChecks();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -45,32 +42,20 @@ namespace QR_API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             // Включаем использование CORS
             app.UseCors("AllowAllOrigins");
             // Включаем маршрутизацию
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             // Настраиваем маршруты для контроллеров
             app.MapControllers();
-<<<<<<< HEAD
-            
-=======
 
-            app.UseHealthChecks("/health");
->>>>>>> main
 
             // Запускаем приложение
             app.Run();
         }
-<<<<<<< HEAD
-=======
-      
->>>>>>> main
     }
 }
-
 
 
