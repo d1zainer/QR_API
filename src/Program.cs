@@ -48,7 +48,7 @@ namespace QR_API
             app.UseHealthChecks("/health");
             // Включаем маршрутизацию
             app.UseRouting();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+           
             // Настраиваем маршруты для контроллеров
             app.MapControllers();
 
