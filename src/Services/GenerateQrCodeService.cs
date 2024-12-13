@@ -1,5 +1,4 @@
-﻿using MessagingToolkit.QRCode.Codec;
-using System.Drawing;
+﻿
 using QR_API.Models;
 
 using Microsoft.AspNetCore.Mvc;
