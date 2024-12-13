@@ -5,8 +5,8 @@ using QR_API.Services;
 
 namespace QR_API.Controllers
 {
+    [Route("api")]
     [ApiController]
-    [Route("[controller]")]
     public class QrCodeController : ControllerBase
     {
         /// <summary>
@@ -15,7 +15,7 @@ namespace QR_API.Controllers
         /// <remarks>7
         /// Sample request:
         ///
-        ///     POST /api/QRCode
+        ///     POST /api/GetQr
         ///     {
         ///        "InputData": "Hello QR",
         ///        "BgColor": "#FF5733",
@@ -32,7 +32,7 @@ namespace QR_API.Controllers
                 return validationResult;
             }
             var result = GenerateQrCodeService.GetQrByName(qr);
-            return result;
+            return Ok(result);
         }
     }
 }
