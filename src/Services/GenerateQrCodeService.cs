@@ -1,12 +1,11 @@
 ﻿using MessagingToolkit.QRCode.Codec;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
 using QR_API.Models;
 
-using IronSoftware.Drawing;
-
 using Microsoft.AspNetCore.Mvc;
+using SkiaSharp.QrCode;
+using SkiaSharp;
+using System.Text;
 
 namespace QR_API.Services
 {
@@ -19,43 +18,25 @@ namespace QR_API.Services
         /// <returns>Ответ с данными QR-кода или ошибкой</returns>
         public static ActionResult<QrCodeResponse> GetQrByName(QrCodeRequest request)
         {
-            QRCodeEncoder encoder = new QRCodeEncoder();
-
-            encoder.QRCodeBackgroundColor = ColorTranslator.FromHtml(request.BgColor);
-            
-            encoder.QRCodeForegroundColor = ColorTranslator.FromHtml(request.FgColor);
-            try
+            using var generator = new QRCodeGenerator();
+            var level = ECCLevel.H;
+            var qr = generator.CreateQrCode(request.InputData, level);
+            var info = new SKImageInfo(512, 512);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            canvas.Render(qr, 512, 512, SKColors.White, SKColor.Parse(request.FgColor), SKColor.Parse(request.BgColor)) ;
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            var base64String = Convert.ToBase64String(data.ToArray());
+            var utf8Bytes = Encoding.UTF8.GetBytes(base64String);
+            var utf8Base64String = Encoding.UTF8.GetString(utf8Bytes);
+            var response = new QrCodeResponse()
             {
-                Bitmap qrcode = encoder.Encode(request.InputData, Encoding.UTF8);
-                QrCodeResponse response = new QrCodeResponse
-                {
-                    OutputData = Convert.ToBase64String(GetArray(qrcode)), // Конвертируем в Base64
-                    Format = AnyBitmap.ImageFormat.Png.ToString() // Устанавливаем формат
-                };
-
-                return new OkObjectResult(response);
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(new QrCodeResponse
-                {
-                    OutputData = ex.Message
-                });
-            }
+                OutputData = utf8Base64String, // Убедимся, что строка в UTF-8
+                Format = SKEncodedImageFormat.Png.ToString()
+            };
+            return response;
+           
         }
-
-        /// Создает массив байтов из битмапа
-        /// </summary>
-        /// <param name="qrcode"></param>
-        /// <returns></returns>
-        private static byte[] GetArray(Bitmap qrcode)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                qrcode.Save(stream, ImageFormat.Png);
-                return stream.ToArray();
-            }
-        }
-        
     }
 }

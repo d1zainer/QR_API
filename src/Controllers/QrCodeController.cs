@@ -12,7 +12,7 @@ namespace QR_API.Controllers
         /// <summary>
         /// Получить QR
         /// </summary>
-        /// <remarks>
+        /// <remarks>7
         /// Sample request:
         ///
         ///     POST /api/QRCode

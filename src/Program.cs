@@ -45,6 +45,7 @@ namespace QR_API
 
             // ¬ключаем использование CORS
             app.UseCors("AllowAllOrigins");
+            app.UseHealthChecks("/health");
             // ¬ключаем маршрутизацию
             app.UseRouting();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
