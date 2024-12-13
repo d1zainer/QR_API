@@ -11,7 +11,9 @@ namespace QR_API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddHealthChecks();
+            builder.Services.AddHealthChecks(); 
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.EnableAnnotations();
@@ -33,8 +35,6 @@ namespace QR_API
                 });
             });
 
-            // Добавляем контроллеры
-            builder.Services.AddControllers();
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -46,8 +46,7 @@ namespace QR_API
             // Включаем использование CORS
             app.UseCors("AllowAllOrigins");
             app.UseHealthChecks("/health");
-            // Включаем маршрутизацию
-            app.UseRouting();
+
            
             // Настраиваем маршруты для контроллеров
             app.MapControllers();
