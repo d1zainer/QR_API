@@ -5,8 +5,8 @@ using QR_API.Services;
 
 namespace QR_API.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [Route("[controller]")]
     public class QrCodeController : ControllerBase
     {
         /// <summary>
