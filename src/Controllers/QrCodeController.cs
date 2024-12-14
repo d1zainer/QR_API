@@ -32,7 +32,7 @@ namespace QR_API.Controllers
                 return validationResult;
             }
             var result = GenerateQrCodeService.GetQrByName(qr);
-            return Ok(result);
+            return Ok(result.Value);
         }
     }
 }
